@@ -14,13 +14,7 @@ const getUserId = (req, res) => {
       }
       return res.send(user);
     })
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара!' });
-      } else {
-        res.status(500).send({ message: 'Ошибка' });
-      }
-    });
+    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 };
 
 const createUser = (req, res) => {
@@ -40,5 +34,5 @@ const createUser = (req, res) => {
 module.exports = {
   getUsers,
   getUserId,
-  createUser
-}
+  createUser,
+};
