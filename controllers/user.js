@@ -24,7 +24,47 @@ const createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Ошибка при валидации' });
+        res.status(400).send({ message: 'Ошибка при создании пользователя' });
+      } else {
+        res.status(500).send({ message: 'Ошибка' });
+      }
+    });
+};
+
+const updateUserInfo = (req, res) => {
+  const { id } = req.user._id;
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь с таким Id не существует' });
+      }
+      return res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({ message: 'Данные не корректны' });
+      } else {
+        res.status(500).send({ message: 'Ошибка' });
+      }
+    });
+};
+
+const updateUserAvatar = (req, res) => {
+  const { id } = req.user._id;
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователь с таким Id не существует' });
+      }
+      return res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.kind === 'ObjectId' || err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({ message: 'Ссылка на аватар не корректна' });
       } else {
         res.status(500).send({ message: 'Ошибка' });
       }
@@ -35,4 +75,6 @@ module.exports = {
   getUsers,
   getUserId,
   createUser,
+  updateUserInfo,
+  updateUserAvatar,
 };

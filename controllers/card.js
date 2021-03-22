@@ -1,26 +1,30 @@
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
     .catch(() => res.status(500).send({ message: 'Ошибка' }));
 };
 
-module.exports.createCard = (req, res) => {
+const createCard = (req, res) => {
+  const ownerId = req.user._id;
   const { name, link } = req.body;
 
-  Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send(card))
+  Card.create({ name, link, owner: ownerId })
+    .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Ошибка при валидации' });
-      } else {
-        res.status(500).send({ message: 'Ошибка' });
+      if (!name || !link) {
+        return res.status(400).send({
+          message: `Ошибка: ${err}. Вы не заполнили обязательные поля`,
+        });
       }
+      return res.status(500).send({
+        message: `Ошибка: ${err}`,
+      });
     });
 };
 
-module.exports.deleteCardByID = (req, res) => {
+const deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
@@ -32,7 +36,7 @@ module.exports.deleteCardByID = (req, res) => {
     .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
 };
 
-module.exports.likeCard = (req, res) => {
+const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -53,7 +57,7 @@ module.exports.likeCard = (req, res) => {
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
@@ -65,4 +69,12 @@ module.exports.dislikeCard = (req, res) => {
     }
   })
     .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+};
+
+module.exports = {
+  getCards,
+  createCard,
+  deleteCardById,
+  likeCard,
+  dislikeCard,
 };

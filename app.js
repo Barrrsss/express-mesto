@@ -8,7 +8,6 @@ const app = express();
 const { PORT = 3000 } = process.env;
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -16,11 +15,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use(router);
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '605725443707ca255014f846',
+    _id: '60589bf23901d536aca9d208',
   };
 
   next();
@@ -29,3 +26,5 @@ app.use((req, res, next) => {
 app.listen(PORT, () => {
 
 });
+
+app.use(router);
