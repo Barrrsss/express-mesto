@@ -63,8 +63,10 @@ const updateUserAvatar = (req, res) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId' || err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({ message: 'Ссылка на аватар не корректна' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Ссылка на аватар не корректен' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Id не корректен' });
       } else {
         res.status(500).send({ message: 'Ошибка' });
       }
