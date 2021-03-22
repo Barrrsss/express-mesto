@@ -7,20 +7,17 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const ownerId = req.user._id;
   const { name, link } = req.body;
+  const ownerId = req.user._id;
 
   Card.create({ name, link, owner: ownerId })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (!name || !link) {
-        return res.status(400).send({
-          message: `Ошибка: ${err}. Вы не заполнили обязательные поля`,
-        });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: `Ошибка: ${err}. Вы не заполнили обязательные поля или данные не верны` });
+      } else {
+        res.status(500).send({ message: `Ошибка ${err}` });
       }
-      return res.status(500).send({
-        message: `Ошибка: ${err}`,
-      });
     });
 };
 
@@ -28,12 +25,17 @@ const deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Карточка с таким Id не найдена!' });
+        res.status(404).send({ message: 'Карточка с таким id не найдена!' });
       } else {
         res.send(card);
       }
     })
-    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Неправильный id' });
+      }
+      return res.status(500).send({ message: 'Ошибка' });
+    });
 };
 
 const likeCard = (req, res) => {
@@ -49,8 +51,8 @@ const likeCard = (req, res) => {
     }
   })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Ошибка при валидации' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Id не корректен' });
       } else {
         res.status(500).send({ message: 'Ошибка' });
       }
@@ -68,7 +70,13 @@ const dislikeCard = (req, res) => {
       res.send(card);
     }
   })
-    .catch((err) => res.status(500).send({ message: `Ошибка ${err}` }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Id не корректен' });
+      } else {
+        res.status(500).send({ message: 'Ошибка' });
+      }
+    });
 };
 
 module.exports = {

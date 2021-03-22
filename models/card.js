@@ -14,7 +14,7 @@ const cardSchema = mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    requires: true,
+    required: true,
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
