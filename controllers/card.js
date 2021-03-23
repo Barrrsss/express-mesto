@@ -14,9 +14,9 @@ const createCard = (req, res) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка: ${err.message}. Вы не заполнили обязательные поля или данные не верны` });
+        res.status(400).send({ message: 'Вы не заполнили обязательные поля или данные не верны' });
       } else {
-        res.status(500).send({ message: `Ошибка ${err}` });
+        res.status(500).send({ message: 'Ошибка' });
       }
     });
 };

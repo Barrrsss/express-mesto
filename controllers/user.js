@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(() => res.status(500).send({ message: 'Ошибка' }));
 };
 
@@ -12,7 +12,7 @@ const getUserId = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с таким Id не существует' });
       }
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -27,7 +27,7 @@ const createUser = (req, res) => {
   const data = { ...req.body };
 
   User.create(data)
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Ошибка при создании пользователя' });
@@ -46,7 +46,7 @@ const updateUserInfo = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с таким Id не существует' });
       }
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -66,7 +66,7 @@ const updateUserAvatar = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с таким Id не существует' });
       }
-      return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
