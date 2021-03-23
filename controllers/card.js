@@ -14,7 +14,7 @@ const createCard = (req, res) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `Ошибка: ${err}. Вы не заполнили обязательные поля или данные не верны` });
+        res.status(400).send({ message: `Ошибка: ${err.message}. Вы не заполнили обязательные поля или данные не верны` });
       } else {
         res.status(500).send({ message: `Ошибка ${err}` });
       }
@@ -67,6 +67,7 @@ const dislikeCard = (req, res) => {
   ).then((card) => {
     if (!card) {
       res.status(404).send({ message: 'Карточка с таким Id не найдена!' });
+    } else {
       res.send(card);
     }
   })
