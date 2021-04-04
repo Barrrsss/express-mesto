@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
@@ -23,18 +25,24 @@ const getUserId = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
-  const data = { ...req.body };
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
-  User.create(data)
-    .then((user) => res.send(user))
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Ошибка при создании пользователя' });
       } else {
         res.status(500).send({ message: 'Ошибка' });
       }
-    });
+    })
+    .catch(next);
 };
 
 const updateUserInfo = (req, res) => {
@@ -78,6 +86,27 @@ const updateUserAvatar = (req, res) => {
       }
     });
 };
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        jwt,
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('jwt', token, {
+          maxAge: '7d',
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ message: 'Вы успешно авторизовались' });
+    })
+    .catch(next);
+};
 
 module.exports = {
   getUsers,
@@ -85,4 +114,5 @@ module.exports = {
   createUser,
   updateUserInfo,
   updateUserAvatar,
+  login,
 };

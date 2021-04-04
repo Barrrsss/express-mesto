@@ -23,6 +23,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(require('./routes/auth'));
+
 app.use(router);
 
 app.listen(PORT, () => {
