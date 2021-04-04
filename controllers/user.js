@@ -108,6 +108,21 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const getUser = (req, res, next) => {
+  User.findOne({ _id: req.user._id })
+    .orFail(new NotFoundError('Пользователь с указанным _id не найден'))
+    .then((user) => {
+      res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Невалидный id'));
+      } else {
+        next(err);
+      }
+    });
+};
+
 module.exports = {
   getUsers,
   getUserId,
@@ -115,4 +130,5 @@ module.exports = {
   updateUserInfo,
   updateUserAvatar,
   login,
+  getUser,
 };

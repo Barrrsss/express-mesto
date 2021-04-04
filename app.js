@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const router = require('./routes');
+const auth = require('./middlewares/auth');
 
 const app = express();
 
@@ -15,15 +16,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '60589bf23901d536aca9d208',
-  };
-
-  next();
-});
-
 app.use(require('./routes/auth'));
+
+app.use(auth);
 
 app.use(router);
 

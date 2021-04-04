@@ -30,5 +30,19 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        console.log('Нет такого пользователя');
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            console.log('Пароль не верен');
+          }
+          return user;
+        });
+    });
+};
 module.exports = mongoose.model('user', userSchema);
