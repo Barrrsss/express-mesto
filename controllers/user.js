@@ -41,9 +41,7 @@ const createUser = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest(
-          'Ошибка при создании пользователя',
-        );
+        throw new BadRequest('Ошибка при создании пользователя');
       } else if (err.name === 'MongoError' && err.code === 11000) {
         throw new ConflictingRequest('Пользователь с таким E-mail уже существует');
       }
@@ -95,17 +93,17 @@ const updateUserAvatar = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         'secretOrPrivateKey123',
-        { expiresIn: '7d' },
+        { expiresIn: 1000 * 3600 * 24 * 7 },
       );
 
-      res.status(200)
+      res
         .cookie('jwt', token, {
-          maxAge: '7d',
+          maxAge: 1000 * 3600 * 24 * 7,
           httpOnly: true,
           sameSite: true,
         })
