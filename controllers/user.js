@@ -98,12 +98,12 @@ const login = (req, res, next) => {
       const token = jwt.sign(
         { _id: user._id },
         'secretOrPrivateKey123',
-        { expiresIn: 1000 * 3600 * 24 * 7 },
+        { expiresIn: 604800000 },
       );
 
       res
         .cookie('jwt', token, {
-          maxAge: 1000 * 3600 * 24 * 7,
+          maxAge: 604800000,
           httpOnly: true,
           sameSite: true,
         })
