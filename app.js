@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const cookieParser = require('cookie-parser');
 const router = require('./routes');
 const auth = require('./middlewares/auth');
+const cookieParser = require('cookie-parser');
 const { serverError } = require('./middlewares/ServerError');
 
 const app = express();

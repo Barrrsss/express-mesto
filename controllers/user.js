@@ -50,16 +50,11 @@ const createUser = (req, res, next) => {
 };
 
 const updateUserInfo = (req, res, next) => {
-  const { id } = req.user._id;
+  const id = req.user._id;
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
-    .then((user) => {
-      if (!user) {
-        next(new NotFound('Пользователь с таким Id не существует'));
-      }
-      return res.send(user);
-    })
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true, upsert: true })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequest('Данные пользователя не корректны'));
@@ -70,10 +65,10 @@ const updateUserInfo = (req, res, next) => {
 };
 
 const updateUserAvatar = (req, res, next) => {
-  const { id } = req.user._id;
+  const id = req.user._id;
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true, upsert: true })
     .then((user) => {
       if (!user) {
         next(new NotFound('Пользователь с таким Id не существует'));
@@ -113,14 +108,16 @@ const login = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findOne({ _id: req.user._id })
-    .orFail(new NotFound('Пользователь с указанным id не найден'))
+  User.findById(req.user._id)
     .then((user) => {
-      res.send(user);
+      if (!user) {
+        throw new NotFound('Пользователь по указанному _id не найден!');
+      }
+      return res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Невалидный id'));
+      if (err.kind === 'ObjectId') {
+        next(new NotFound('Пользователь по указанному _id не найден!'));
       } else {
         next(err);
       }
