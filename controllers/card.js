@@ -18,73 +18,81 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Вы не заполнили обязательные поля или данные не верны'));
-      } else {
-        res.status(500).send({ message: 'Ошибка' });
+        throw new BadRequest('Вы не заполнили обязательные поля или данные не верны');
       }
-    });
+    })
+    .catch(next);
 };
 
 const deleteCardById = (req, res, next) => {
   Card.findById(req.params.id)
-    .orFail(new NotFound('Карточка с таким id не найдена!'))
+    .orFail(() => { throw new NotFound('Карточка с таким id не найдена!'); })
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
-        card.remove();
-        res.send({ message: 'Карточка удалена' });
+        Card.findByIdAndRemove(req.params.id)
+          // eslint-disable-next-line no-shadow
+          .then((card) => {
+            res.send(card);
+          })
+          .catch((err) => {
+            if (err.name === 'CastError') {
+              throw new BadRequest('Неправильный id');
+            }
+          });
       } else {
         throw new Forbidden('Недостаточно прав для удаления карточки');
       }
+      return res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Неправильный id'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.id,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  ).then((card) => {
-    if (!card) {
-      next(new NotFound('Карточка с таким id не найдена!'));
-    } else {
-      res.send(card);
-    }
-  })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Неправильный id'));
-      } else {
-        next(err);
-      }
-    });
+  Card.findById(req.params.id)
+    .orFail(() => {
+      throw new NotFound('Карточка с таким id не найдена!');
+    })
+    // eslint-disable-next-line no-unused-vars
+    .then((card) => {
+      Card.findByIdAndUpdate(
+        req.params.id,
+        { $addToSet: { likes: req.user } },
+        { new: true },
+      )
+        // eslint-disable-next-line no-shadow
+        .then((card) => res.send(card))
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            throw new BadRequest('Ошибка валидации данных');
+          }
+        })
+        .catch(next);
+    })
+    .catch(next);
 };
 
 const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.id,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  ).then((card) => {
-    if (!card) {
-      next(new NotFound('Карточка с таким id не найдена!'));
-    } else {
-      res.send(card);
-    }
-  })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Неправильный id'));
-      } else {
-        next(err);
-      }
-    });
+  Card.findById(req.params.id)
+    .orFail(() => {
+      throw new NotFound('Карточка с таким id не найдена!');
+    })
+    // eslint-disable-next-line no-unused-vars
+    .then((card) => {
+      Card.findByIdAndUpdate(
+        req.params.id,
+        { $pull: { likes: req.user._id } },
+        { new: true },
+      )
+        // eslint-disable-next-line no-shadow
+        .then((card) => res.send(card))
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            throw new BadRequest('Неправильный id');
+          }
+        })
+        .catch(next);
+    })
+    .catch(next);
 };
 
 module.exports = {

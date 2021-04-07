@@ -1,19 +1,9 @@
-const { isCelebrateError } = require('celebrate');
+module.exports.errorHandler = (err, req, res, next) => {
+  const { statusCode = 500, message } = err;
 
-const errors = (err, req, res, next) => {
-  if (isCelebrateError(err)) {
-    res.status(400).send({ message: err.details.get('body').message });
-  } else if (err.name === 'CastError') {
-    res.status(400).send({ message: 'Неверный запрос' });
-  } else if (!err.code) {
-    res.status(500).send({ message: 'Ошибка сервера или неверный запрос' });
-  } else {
-    res.status(err.code).send({ message: err.message });
-  }
+  res.status(statusCode).send({
+    message: statusCode === 500 ? 'Ошибка сервера или неверный запрос' : message,
+  });
 
   next();
-};
-
-module.exports = {
-  errors,
 };

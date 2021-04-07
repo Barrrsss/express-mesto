@@ -2,9 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const router = require('./routes');
 const auth = require('./middlewares/auth');
-const { errors } = require('./middlewares/errors');
+const { errorHandler } = require('./middlewares/errors');
 
 const app = express();
 
@@ -27,7 +28,9 @@ app.use(auth);
 
 app.use(router);
 
-app.use(errors);
+app.use(errors());
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
 
