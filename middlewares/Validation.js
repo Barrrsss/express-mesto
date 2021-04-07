@@ -10,7 +10,7 @@ const validateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required()
       .error(new Joi.ValidationError(wrongName)),
-    link: Joi.string().min(18).required()
+    about: Joi.string().min(2).required()
       .error(new Joi.ValidationError(wrongAbout)),
   }).unknown(true),
 });
@@ -27,17 +27,17 @@ const validateCard = celebrate({
     name: Joi.string().required().min(2).max(30)
       .error(new Joi.ValidationError(wrongName)),
     link: Joi.string().pattern(link).required()
-      .error(new Joi.ValidationError(wrongAbout)),
+      .error(new Joi.ValidationError(wrongLink)),
   }).unknown(true),
 });
 
 const validateSigIn = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email()
-      .error(new Joi.ValidationError(wrongAuth)),
+      .error(new Joi.ValidationError(wrongName)),
     password: Joi.string()
       .required().min(4)
-      .error(new Joi.ValidationError(wrongAuth)),
+      .error(new Joi.ValidationError(wrongName)),
   }).unknown(true),
 });
 
