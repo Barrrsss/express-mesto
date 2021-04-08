@@ -1,64 +1,65 @@
 const { celebrate, Joi } = require('celebrate');
+const errorMessages = require('../errors/ErrorMessages');
+
+const {
+  wrongName, wrongAbout, wrongLink, wrongAuth, wrongId, wrongMail, wrongPassword,
+} = errorMessages;
 
 const link = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/i;
 
 const validateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).required(),
+    name: Joi.string().min(2).max(30).required()
+      .error(new Joi.ValidationError(wrongName)),
+    about: Joi.string().min(2).required()
+      .error(new Joi.ValidationError(wrongAbout)),
   }).unknown(true),
 });
 
 const validateAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(link).required(),
+    avatar: Joi.string().pattern(link).required()
+      .error(new Joi.ValidationError(wrongLink)),
   }).unknown(true),
 });
 
 const validateId = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().length(24).hex().required(),
+  body: Joi.object().keys({
+    id: Joi.string().hex().length(24).required()
+      .error(new Joi.ValidationError(wrongId)),
   }).unknown(true),
 });
 
 const validateCard = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().pattern(link).required(),
+    name: Joi.string().required().min(2).max(30)
+      .error(new Joi.ValidationError(wrongName)),
+    link: Joi.string().pattern(link).required()
+      .error(new Joi.ValidationError(wrongLink)),
   }).unknown(true),
 });
 
 const validateSigIn = celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(4),
+    email: Joi.string().required().email()
+      .error(new Joi.ValidationError(wrongAuth)),
+    password: Joi.string().required().min(4)
+      .error(new Joi.ValidationError(wrongAuth)),
   }).unknown(true),
 });
 
 const validateSigUp = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).error((errors) => {
-      errors.forEach((err) => {
-        switch (err.code) {
-          case 'any.empty':
-            err.message = 'Value should not be empty!';
-            break;
-          case 'string.min':
-            err.message = 'Value should have at least 2 characters!';
-            break;
-          case 'string.max':
-            err.message = 'Value should have at most 1 characters!';
-            break;
-          default:
-            break;
-        }
-      });
-      return errors;
-    }),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(link),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(4).error(new Error('Email is a required field!')),
+    name: Joi.string().min(2).max(30).error(new Joi.ValidationError(wrongName))
+      .error(new Joi.ValidationError(wrongName)),
+    about: Joi.string().min(2).max(30)
+      .error(new Joi.ValidationError(wrongAbout)),
+    avatar: Joi.string().pattern(link)
+      .error(new Joi.ValidationError(wrongLink)),
+    email: Joi.string().required().email()
+      .error(new Joi.ValidationError(wrongMail)),
+    password: Joi.string().required().min(4)
+      .error(new Joi.ValidationError(wrongPassword)),
   }).unknown(true),
 });
 
