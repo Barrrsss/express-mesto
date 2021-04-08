@@ -1,8 +1,12 @@
 const { isCelebrateError } = require('celebrate');
 
+// eslint-disable-next-line consistent-return
 const errors = (err, req, res, next) => {
   if (isCelebrateError(err)) {
-    res.send({ message: err.details.get('body').message });
+    if (!err.details.get('body')) {
+      return res.status(400).send({ message: err.details.get('params').message });
+    }
+    res.status(400).send({ message: err.details.get('body').message });
   } else {
     const { statusCode = 500, message } = err;
     res.status(statusCode).send({

@@ -24,8 +24,9 @@ const validateAvatar = celebrate({
 });
 
 const validateId = celebrate({
-  body: Joi.object().keys({
+  params: Joi.object().keys({
     id: Joi.string().hex().length(24).required()
+      .alphanum()
       .error(new Joi.ValidationError(wrongId)),
   }).unknown(true),
 });
@@ -50,7 +51,7 @@ const validateSigIn = celebrate({
 
 const validateSigUp = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).error(new Joi.ValidationError(wrongName))
+    name: Joi.string().min(2).max(30)
       .error(new Joi.ValidationError(wrongName)),
     about: Joi.string().min(2).max(30)
       .error(new Joi.ValidationError(wrongAbout)),
