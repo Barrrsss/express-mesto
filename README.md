@@ -38,53 +38,48 @@
     "email": формат email: "qwer@ya.ru",
     "password": от 4 символов
 
- JSON
-```no-highlight
-{
+ | JSON
+ | --- 
+| {
     "name": "1111",
     "about": "11111",
     "avatar": "http://qwer.ru",
     "email": "qwer@ya.ru",
     "password": "12345678"
 }
-```
 #### 2. /signin метод `POST`
     "email": формат email: "qwer@ya.ru",
     "password": от 4 символов
-JSON
-```no-highlight
-{
+| JSON
+ | --- 
+| {
     "email": "qwer@ya.ru",
     "password": "12345678"
 }
-```
+
 #### 3. /users/me метод `PATCH`
     "name": от 2 до 30 символов,
     "about": от 2 до 30 символов,
-JSON
-```no-highlight
- {
+| JSON
+ | --- 
+| {
     "name": "11112",
-    "about": "111112"
+    "about": "111112",
 }
-```
 #### 4. /users/me/avatar метод `PATCH`
     "avatar": формат ссылки: "http://ya.ru", "https://www.ya.ru",
 
-JSON
-```no-highlight
-{
-    "avatar": "http://qwer1.ru"
+| JSON
+ | --- 
+| {
+    "avatar": "http://qwer1.ru",
 }
-```
 #### 5. /cards метод `POST`
     "name": от 2 до 30 символов,
     "link": формат ссылки: "http://ya.ru", "https://www.ya.ru",
-JSON
-
-```no-highlight
-{
+| JSON
+ | --- 
+| {
     "name": "123",
-    "about": "http://ewq.ru"
+    "about": "http://ewq.ru",
 }
-```

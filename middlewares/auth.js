@@ -10,7 +10,8 @@ module.exports = (req, res, next) => {
 
   let payload;
   try {
-    payload = jwt.verify(token, 'secretOrPrivateKey123');
+    const { NODE_ENV, JWT_SECRET } = process.env;
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
     req.user = payload;
     next();
   } catch (err) {

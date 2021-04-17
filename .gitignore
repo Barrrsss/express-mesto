@@ -14,3 +14,8 @@ node_modules
 .DS_Store
 .idea
 .vscode
+
+.env
+.env.example
+.env.local
+.env.staging
